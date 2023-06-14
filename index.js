@@ -3,6 +3,7 @@ import prisma from "./src/utils/prisma.js";
 import { Prisma } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import cors from "cors";
+import { signAccessToken } from "./src/utils/jwt.js"
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -23,7 +24,51 @@ function filter(obj, ...keys) {
   return keys.reduce((a, c) => ({ ...a, [c]: obj[c]}), {})
 }
 
+function validateLogin(input) {
+  const validationErrors = {}
 
+  if (!('email' in input) || input['email'].length == 0) {
+    validationErrors['email'] = 'cannot be blank'
+  }
+
+  if (!('password' in input) || input['password'].length == 0) {
+    validationErrors['password'] = 'cannot be blank'
+  }
+
+  if ('email' in input && !input['email'].match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/)) {
+    validationErrors['email'] = 'is invalid'
+  }
+
+  return validationErrors
+}
+
+app.post('/sign-in', async (req, res) => {
+  const data = req.body
+
+  const validationErrors = validateLogin(data)
+
+  if (Object.keys(validationErrors).length != 0) return res.status(400).send({
+    error: validationErrors
+  })
+
+  const user = await prisma.user.findUnique({
+    where: {
+      email: data.email
+    }
+  })
+
+  if (!user) return res.status(401).send({
+    error: 'Email address or password not valid'
+  })
+
+  const checkPassword = bcrypt.compareSync(data.password, user.password)
+  if (!checkPassword) return res.status(401).send({
+    error: 'Email address or password not valid'
+  })
+
+  const accessToken = await signAccessToken(user)
+  return res.json({ accessToken })
+})
 
 function validateUser(input) {
   const validationErrors = {}
