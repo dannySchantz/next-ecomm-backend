@@ -6,7 +6,7 @@ import cors from "cors";
 import { signAccessToken } from "./src/utils/jwt.js"
 
 const app = express();
-const port = process.env.PORT || 8080;
+// const port = process.env.PORT || 8080;
 
 app.use(express.json());
 app.use(cors());
@@ -129,6 +129,7 @@ app.post('/users', async (req, res) => {
 })
  
 
-app.listen(port, () => {
-  console.log(`App started; listening on port ${port}`);
-});
+// app.listen(port, () => {
+//   console.log(`App started; listening on port ${port}`);
+// });
+export default app
