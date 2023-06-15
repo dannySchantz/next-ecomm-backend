@@ -12,25 +12,58 @@ async function cleanupDatabase() {
 }
 
 describe("POST /sign-in", () => {
-  const auth = {
-    accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjp7ImlkIjoyMiwibmFtZSI6ImhlbGxvIiwiZW1haWwiOiJhMTBAYS5jb20iLCJwYXNzd29yZCI6IiQyYSQwOCRycHNCVVdjYmFrSkFQUmJWd3ZjdHBPRG9lUXhVMzBaczFpTHo3MWx2NGxFUk5ObG1sSFE5YSJ9LCJpYXQiOjE2ODY3MjQwMjJ9.dXa0KK4N5N8glN2IgitsU8kq9nlk6AM_X0600vjOTYk"
-  }
+    const user = {
+        name: 'John',
+        email: 'john90@example.com',
+        password: 'insecure',
+    }
 
-  beforeAll(async () => {
-    await cleanupDatabase()
+    beforeAll(async () => {
+        await cleanupDatabase()
+    })
 
-  })
+    afterAll(async () => {
+        await cleanupDatabase()
+    })
 
-  afterAll(async () => {
-    await cleanupDatabase()
-  })
+    it("with valid data should return 200", async () => {
+        const response = await request(app)
+            .post("/users")
+            .send(user)
+            .set('Accept', 'application/json')
+        expect(response.statusCode).toBe(200);
+        expect(response.body.id).toBeTruthy;
+        expect(response.body.name).toBe(user.name);
+        expect(response.body.email).toBe(user.email);
+        expect(response.body.password).toBe(undefined);
+    });
 
-  it("with valid data should return the access token", async () => {
-    const response = await request(app)
-        .post("/sign-in")
-        .send(auth)
-        .set('Accept', 'application/json')
-    expect(response.statusCode).toBe(200);
-    expect(response.body.accessToken).toBe("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjp7ImlkIjoyMiwibmFtZSI6ImhlbGxvIiwiZW1haWwiOiJhMTBAYS5jb20iLCJwYXNzd29yZCI6IiQyYSQwOCRycHNCVVdjYmFrSkFQUmJWd3ZjdHBPRG9lUXhVMzBaczFpTHo3MWx2NGxFUk5ObG1sSFE5YSJ9LCJpYXQiOjE2ODY3MzA0NzJ9.2rVpK7FrK0YXCi5HtYQj7rfX8Wef3S2WcfabvDkmjlA");
-  });
+    it("with valid data should return the access token", async () => {
+        const response = await request(app)
+            .post("/sign-in")
+            .send(user)
+            .set('Accept', 'application/json')
+        expect(response.statusCode).toBe(200);
+        expect(response.body.accessToken).toBeTruthy
+    });
+
+    it("with invalid email should fail", async () => {
+        user.email = 'a00@a.com'
+        const response = await request(app)
+            .post("/sign-in")
+            .send(user)
+            .set('Accept', 'application/json')
+        expect(response.statusCode).toBe(401);
+        expect(response.body.accessToken).toBeFalsy
+    });
+
+    it("with invalid password should fail", async () => {
+        user.password = '123456789'
+        const response = await request(app)
+            .post("/sign-in")
+            .send(user)
+            .set('Accept', 'application/json')
+        expect(response.statusCode).toBe(401);
+        expect(response.body.accessToken).toBeFalsy
+    });
 })
