@@ -4,10 +4,13 @@ import bcrypt from "bcryptjs"
 import prisma from "../utils/prisma.js"
 // import { validateUser } from "../validators/users.js"
 // import { filter } from "../utils/common.js"
+import { validateLogin } from '../validators/auth.js'
+import { signAccessToken } from '../utils/jwt.js'
+
 const router = express.Router()
 
 
-router.post('/auth', async (req, res) => {
+router.post('/', async (req, res) => {
     const data = req.body
   
     const validationErrors = validateLogin(data)
