@@ -11,7 +11,7 @@ async function cleanupDatabase() {
   );
 }
 
-describe("POST /sign-in", () => {
+describe("POST /auth", () => {
     const user = {
         name: 'John',
         email: 'john90@example.com',
@@ -40,7 +40,7 @@ describe("POST /sign-in", () => {
 
     it("with valid data should return the access token", async () => {
         const response = await request(app)
-            .post("/sign-in")
+            .post("/auth")
             .send(user)
             .set('Accept', 'application/json')
         expect(response.statusCode).toBe(200);
@@ -50,7 +50,7 @@ describe("POST /sign-in", () => {
     it("with invalid email should fail", async () => {
         user.email = 'a00@a.com'
         const response = await request(app)
-            .post("/sign-in")
+            .post("/auth")
             .send(user)
             .set('Accept', 'application/json')
         expect(response.statusCode).toBe(401);
@@ -60,7 +60,7 @@ describe("POST /sign-in", () => {
     it("with invalid password should fail", async () => {
         user.password = '123456789'
         const response = await request(app)
-            .post("/sign-in")
+            .post("/auth")
             .send(user)
             .set('Accept', 'application/json')
         expect(response.statusCode).toBe(401);
