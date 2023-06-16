@@ -4,35 +4,60 @@ import { Prisma } from "@prisma/client"
 import prisma from "../utils/prisma.js"
 import { validateUser } from "../validators/users.js"
 import { filter } from "../utils/common.js"
+import sgMail from '@sendgrid/mail'
+
 const router = express.Router()
+ 
+const sendGridKey = process.env.SENDGRID_API_KEY
+sgMail.setApiKey(sendGridKey)
+
+router.get('/', async (req, res) => {
+    const allUsers = await prisma.user.findMany()
+    res.json(allUsers)
+})
 
 router.post('/', async (req, res) => {
-  const data = req.body
+  const data = req.body;
 
-  const validationErrors = validateUser(data)
+  const validationErrors = validateUser(data);
 
-  if (Object.keys(validationErrors).length != 0) return res.status(400).send({
-    error: validationErrors
-  })
+  if (Object.keys(validationErrors).length !== 0)
+    return res.status(400).send({
+      error: validationErrors,
+    });
 
   data.password = bcrypt.hashSync(data.password, 8);
 
-  prisma.user.create({
-    data
-  }).then(user => {
-    return res.json(filter(user, 'id', 'name', 'email'))
+  try {
+    const user = await prisma.user.create({
+      data,
+    });
 
-  }).catch(err => {
-    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
-      const formattedError = {}
-      formattedError[`${err.meta.target[0]}`] = 'already taken'
+    const msg = {
+      to: user.email,
+      from: 'dschantz801@gmail.com',
+      subject: 'Welcome to our website',
+      text: 'Thank you for signing up!',
+      html: '<strong>Thank you for signing up!</strong>',
+    };
+
+    await sgMail.send(msg);
+
+    return res.json(filter(user, 'id', 'name', 'email'));
+  } catch (err) {
+    if (
+      err instanceof Prisma.PrismaClientKnownRequestError &&
+      err.code === 'P2002'
+    ) {
+      const formattedError = {};
+      formattedError[`${err.meta.target[0]}`] = 'already taken';
 
       return res.status(500).send({
-        error: formattedError
-      })
+        error: formattedError,
+      });
     }
-    throw err
-  })
-})
+    throw err;
+  }
+});
 
 export default router

@@ -1,10 +1,15 @@
 import express from "express"
-import userRouter from "./src/controllers/users.controllers.js"
+import usersRouter from "./src/controllers/users.controllers.js"
 import authRouter from "./src/controllers/auth.controllers.js"
-const app = express()
-app.use(express.json())
+import cors from 'cors'
+import morgan from "morgan"
 
-app.use('/users', userRouter)
+const app = express()
+app.use(morgan('combined'))
+app.use(express.json())
+app.use(cors())
+
+app.use('/users', usersRouter)
 app.use('/auth', authRouter)
 
 export default app
