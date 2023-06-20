@@ -33,8 +33,8 @@ router.post('/', async (req, res) => {
     if (!checkPassword) return res.status(401).send({
       error: 'Email address or password not valid'
     })
-  
-    const accessToken = await signAccessToken(user)
+    const userFiltered = filter(user, 'id', 'name', 'email')
+    const accessToken = await signAccessToken(userFiltered)
     return res.json({ accessToken })
   })
 

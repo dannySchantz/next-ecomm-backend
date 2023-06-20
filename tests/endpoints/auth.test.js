@@ -58,6 +58,7 @@ describe("POST /auth", () => {
     });
 
     it("with invalid password should fail", async () => {
+        user.email = 'john90@example.com'
         user.password = '123456789'
         const response = await request(app)
             .post("/auth")
