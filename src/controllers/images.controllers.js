@@ -33,7 +33,7 @@ router.post('/', auth, async (req, res) => {
     title: data.title,
     description: data.description,
     created_at: data.created_at,
-    userId: req.user.payload.id
+    userId: req.user.payload.id,
   }
 
   try {
