@@ -18,12 +18,6 @@ router.post('/', auth, async (req, res) => {
 
   const validationErrors = validateImage(data);
 
-  const userId = req.user.payload.id
-
-  // const token = auth.
-  // if (!token) {
-  //   return res.status(401).send({ 'error': 'Unauthorized' })
-  // }
 
   if (Object.keys(validationErrors).length !== 0) {
     return res.status(400).send({
