@@ -13,10 +13,10 @@ app.use(cors())
 
 app.use('/users', usersRouter)
 app.use('/auth', authRouter)
-app.use('/images', imagesRouter)
+app.use('/images', auth, imagesRouter)
 
-// app.get('/protected', auth, (req, res) => {
-//     res.json({ "hello": "world" })
-//   })
+app.get('/protected', auth, (req, res) => {
+    res.json({ "hello": "world" })
+  })
 
 export default app

@@ -4,6 +4,7 @@ import prisma from '../utils/prisma.js';
 import { validateImage } from '../validators/images.js';
 import { verifyAccessToken } from '../utils/jwt.js';
 import { filter } from '../utils/common.js';
+import auth from '../middlewares/auth.js';
 
 const router = express.Router();
 
@@ -12,19 +13,10 @@ router.get('/', async (req, res) => {
   res.json(allImages);
 });
 
-router.post('/', async (req, res) => {
+router.post('/', auth, async (req, res) => {
   const data = req.body;
 
   const validationErrors = validateImage(data);
-
-  const token = req.headers.authorization.split(' ')[1]
-
-  
-  if (!token) {
-    return res.status(401).send({ 'error': 'Unauthorized' })
-  }
-  const userData = await verifyAccessToken(token)
-  // const userData = JSON.stringify(rawUserData)
 
 
   if (Object.keys(validationErrors).length !== 0) {
@@ -32,6 +24,7 @@ router.post('/', async (req, res) => {
       error: validationErrors,
     });
   }
+
   const imageData = {
     id: data.id,
     file: data.file,
@@ -40,8 +33,9 @@ router.post('/', async (req, res) => {
     title: data.title,
     description: data.description,
     created_at: data.created_at,
-    userId: userData.id,
+    userId: req.user.payload.id
   }
+
   try {
   const image = await prisma.image.create({
     data: imageData,
@@ -52,7 +46,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', auth, async (req, res) => {
   const image = await prisma.image.findUnique({
     where: {
       id: req.params.id
