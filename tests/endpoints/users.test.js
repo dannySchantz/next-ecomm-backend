@@ -62,6 +62,7 @@ describe("POST /users", () => {
 
     it("with invalid email format should fail", async () => {
         user.email = "invalid-email"
+        user.password = "insecure"
         const response = await request(app)
             .post("/users")
             .send(user)
@@ -73,6 +74,7 @@ describe("POST /users", () => {
 
     it("with blank name should fail", async () => {
         user.name = ""
+        user.email = 'john90@example.com'
         const response = await request(app)
             .post("/users")
             .send(user)

@@ -16,6 +16,30 @@ router.get('/', async (req, res) => {
     res.json(allUsers)
 })
 
+// router.get('/:id', async (req, res) => {
+//   try {
+//     const userId = parseInt(req.params.id);
+//     const user = await prisma.user.findUnique({
+//       where: {
+//         id: userId,
+//       },
+//       select: {
+//         id: true,
+//         name: true,
+//         email: true,
+//       },
+//     });
+
+//     if (user) {
+//       return res.json(user);
+//     } else {
+//       return res.status(404).json({ error: 'User not found' });
+//     }
+//   } catch (error) {
+//     return res.status(500).json({ error: 'Internal server error' });
+//   }
+// });
+
 router.post('/', async (req, res) => {
   const data = req.body;
 
@@ -33,15 +57,15 @@ router.post('/', async (req, res) => {
       data,
     });
 
-    const msg = {
-      to: user.email,
-      from: 'dschantz801@gmail.com',
-      subject: 'Welcome to our website',
-      text: 'Thank you for signing up!',
-      html: '<strong>Thank you for signing up!</strong>',
-    };
+    // const msg = {
+    //   to: user.email,
+    //   from: 'dschantz801@gmail.com',
+    //   subject: 'Welcome to our website',
+    //   text: 'Thank you for signing up!',
+    //   html: '<strong>Thank you for signing up!</strong>',
+    // };
 
-    await sgMail.send(msg);
+    // await sgMail.send(msg);
 
     return res.json(filter(user, 'id', 'name', 'email'));
   } catch (err) {
