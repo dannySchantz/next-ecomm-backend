@@ -15,13 +15,16 @@
   "dependencies": {
     "@prisma/client": "^4.15.0",
     "@sendgrid/mail": "^7.7.0",
+    "@stripe/stripe-js": "^1.54.1",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.0",
     "morgan": "^1.10.0",
-    "prisma": "^4.15.0"
+    "next": "^13.4.7",
+    "prisma": "^4.15.0",
+    "stripe": "^12.9.0"
   },
   "devDependencies": {
     "@babel/plugin-transform-modules-commonjs": "^7.22.5",
